@@ -16,6 +16,9 @@ public class MainPage extends AppCompatActivity {
         findViewById(R.id.btnHsk2).setOnClickListener(v -> onHskSelected(2));
         findViewById(R.id.btnHsk3).setOnClickListener(v -> onHskSelected(3));
         findViewById(R.id.btnHsk4).setOnClickListener(v -> onHskSelected(4));
+        findViewById(R.id.btnHsk5).setOnClickListener(v -> onHskSelected(5));
+        findViewById(R.id.btnHsk6).setOnClickListener(v -> onHskSelected(6));
+        findViewById(R.id.btnHsk7).setOnClickListener(v -> onHskSelected(7));
     }
 
     private void onHskSelected(int level) {

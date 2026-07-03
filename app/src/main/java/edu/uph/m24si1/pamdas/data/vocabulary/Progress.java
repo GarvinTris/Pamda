@@ -12,7 +12,6 @@ public class Progress {
     public boolean firstTryCorrect;
     public int mastery; // 0 to 100
     public long lastReviewed;
-
     public Progress(int vocabularyId, int reviewCount, boolean firstTryCorrect, int mastery, long lastReviewed) {
         this.vocabularyId = vocabularyId;
         this.reviewCount = reviewCount;
