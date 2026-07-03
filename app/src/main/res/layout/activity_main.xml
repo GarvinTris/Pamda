@@ -1,6 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-</androidx.constraintlayout.widget.ConstraintLayout>
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center"
+    android:background="#121212">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PAMDA"
+        android:textColor="#FFFFFF"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="32dp" />
+
+    <Button
+        android:id="@+id/btnHsk1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="HSK Stage 1"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#2C2C2C" />
+
+    <Button
+        android:id="@+id/btnHsk2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="HSK Stage 2"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#2C2C2C" />
+
+    <Button
+        android:id="@+id/btnHsk3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="HSK Stage 3"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#2C2C2C" />
+
+    <Button
+        android:id="@+id/btnHsk4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="HSK Stage 4"
+        android:backgroundTint="#2C2C2C" />
+
+</LinearLayout>

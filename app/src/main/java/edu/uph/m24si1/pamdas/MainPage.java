@@ -19,9 +19,8 @@ public class MainPage extends AppCompatActivity {
     }
 
     private void onHskSelected(int level) {
-        // TODO: sambungkan ke logic quiz backend kamu
-        // Contoh: Intent intent = new Intent(this, QuizActivity.class);
-        // intent.putExtra("hsk_level", level);
-        // startActivity(intent);
+        Intent intent = new Intent(this, QuizPage.class);
+        intent.putExtra("STAGE", level);
+        startActivity(intent);
     }
 }

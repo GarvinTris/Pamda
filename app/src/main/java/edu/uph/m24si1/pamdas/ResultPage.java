@@ -13,7 +13,6 @@ public class ResultPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.resultpage);
 
-        // Ambil data dari Intent (dikirim dari backend/quiz logic kamu)
         int streak        = getIntent().getIntExtra("streak", 0);
         int totalCorrect  = getIntent().getIntExtra("total_correct", 0);
         int totalWrong    = getIntent().getIntExtra("total_wrong", 0);
