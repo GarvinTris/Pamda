@@ -238,6 +238,140 @@
                     android:textColor="#3b82f6" />
             </LinearLayout>
 
+<!--            HSK 5-->
+            <LinearLayout
+                android:id="@+id/btnHsk5"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:background="@drawable/card_hsk"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:layout_marginBottom="12dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="HSK 5"
+                        android:textSize="17sp"
+                        android:textColor="#e6edf3"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2500 kosakata menengah atas"
+                        android:textSize="12sp"
+                        android:textColor="#828282"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textSize="24sp"
+                    android:textColor="#3b82f6" />
+            </LinearLayout>
+
+<!--            HSK 6-->
+            <LinearLayout
+                android:id="@+id/btnHsk6"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:background="@drawable/card_hsk"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:layout_marginBottom="12dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="HSK 6"
+                        android:textSize="17sp"
+                        android:textColor="#e6edf3"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="5000 kosakata menengah atas"
+                        android:textSize="12sp"
+                        android:textColor="#828282"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textSize="24sp"
+                    android:textColor="#3b82f6" />
+            </LinearLayout>
+
+<!--            HSK 7-->
+            <LinearLayout
+                android:id="@+id/btnHsk7"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:background="@drawable/card_hsk"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:layout_marginBottom="12dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="HSK 7"
+                        android:textSize="17sp"
+                        android:textColor="#e6edf3"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lebih dari 5000 kosakata menengah atas"
+                        android:textSize="12sp"
+                        android:textColor="#828282"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textSize="24sp"
+                    android:textColor="#3b82f6" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
