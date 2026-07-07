@@ -1,20 +1,27 @@
 package edu.uph.m24si1.pamdas;
 
-import android.widget.*;
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import android.os.Bundle;
 import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import androidx.appcompat.app.AppCompatActivity;
+
 public class MainPage extends AppCompatActivity {
 
     @Override
-    public void onCreate(Bundle savebd){
-        super.onCreate(savebd);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.mainpage);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        findViewById(R.id.btnHsk1).setOnClickListener(v -> onHskSelected(1));
+        findViewById(R.id.btnHsk2).setOnClickListener(v -> onHskSelected(2));
+        findViewById(R.id.btnHsk3).setOnClickListener(v -> onHskSelected(3));
+        findViewById(R.id.btnHsk4).setOnClickListener(v -> onHskSelected(4));
+    }
+
+    private void onHskSelected(int level) {
+        // TODO: sambungkan ke logic quiz backend kamu
+        // Contoh: Intent intent = new Intent(this, QuizActivity.class);
+        // intent.putExtra("hsk_level", level);
+        // startActivity(intent);
     }
 }

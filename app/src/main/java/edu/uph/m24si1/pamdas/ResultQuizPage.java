@@ -15,7 +15,7 @@ public class ResultQuizPage extends AppCompatActivity {
     public void onCreate(Bundle savebd){
         super.onCreate(savebd);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.mainpage);
+        setContentView(R.layout.resultpagequiz);
 
     }
 }
