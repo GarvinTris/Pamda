@@ -13,6 +13,7 @@
         android:src="@android:drawable/ic_menu_revert"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Back"
+        android:padding="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -22,22 +23,24 @@
         android:layout_height="wrap_content"
         android:text="Stage 1 / 15"
         android:textColor="#FFFFFF"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/btn_back"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_exit_save"
+        app:layout_constraintStart_toEndOf="@id/btn_back"
         app:layout_constraintTop_toTopOf="@id/btn_back" />
 
     <Button
         android:id="@+id/btn_exit_save"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:backgroundTint="#2C2C2C"
         android:text="Keluar &amp; Simpan"
         android:textAllCaps="false"
         android:textColor="#FFFFFF"
-        android:textSize="12sp"
+        android:textSize="11sp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

@@ -3,24 +3,26 @@ package edu.uph.m24si1.pamdas.data.vocabulary;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "vocabulary_table")
+@Entity(tableName = "vocabulary") // Matching user snippet
 public class Vocabulary {
     @PrimaryKey(autoGenerate = true)
     public int id;
-    public String word;
+    public String hanzi;
     public String pinyin;
-    public String definition;
+    public String meaning;
+    public int hskLevel;
     public int stage;
 
-    public Vocabulary(String word, String pinyin, String definition, int stage) {
-        this.word = word;
+    public Vocabulary(String hanzi, String pinyin, String meaning, int hskLevel, int stage) {
+        this.hanzi = hanzi;
         this.pinyin = pinyin;
-        this.definition = definition;
+        this.meaning = meaning;
+        this.hskLevel = hskLevel;
         this.stage = stage;
     }
 
     public String getDisplayHanzi() {
-        if (word == null) return "";
-        return word.replaceAll("[0-9]", "");
+        if (hanzi == null) return "";
+        return hanzi.replaceAll("[0-9]", "");
     }
 }

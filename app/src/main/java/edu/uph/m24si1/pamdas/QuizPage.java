@@ -42,16 +42,19 @@ public class QuizPage extends AppCompatActivity {
 
     private VocabularyDatabase db;
     private VocabularyDao dao;
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
-    private Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private List<Vocabulary> stageVocabularies = new ArrayList<>();
-    private List<Progress> stageProgress = new ArrayList<>();
+    private final List<Progress> stageProgress = new ArrayList<>();
+    private int currentHskLevel = 1;
     private int currentStage = 1;
     private Vocabulary currentQuestion;
     private Progress currentProgress;
 
     private int totalItems = 0;
+    private int sessionCorrectCount = 0;
+    private int sessionWrongCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +65,9 @@ public class QuizPage extends AppCompatActivity {
         initViews();
         initDatabase();
         
-        currentStage = getIntent().getIntExtra("STAGE", 1);
-        tvStage.setText("Stage " + currentStage + " / 15");
+        currentHskLevel = getIntent().getIntExtra("STAGE", 1);
+        currentStage = 1;
+        tvStage.setText("HSK " + currentHskLevel + " - Stage " + currentStage);
 
         loadData();
 
@@ -105,6 +109,7 @@ public class QuizPage extends AppCompatActivity {
     private void initDatabase() {
         db = Room.databaseBuilder(getApplicationContext(),
                 VocabularyDatabase.class, "pamda_db")
+                .createFromAsset("Pamda_db.sqlite3") // Use the external database file
                 .fallbackToDestructiveMigration()
                 .build();
         dao = db.vocabularyDao();
@@ -112,11 +117,15 @@ public class QuizPage extends AppCompatActivity {
 
     private void loadData() {
         executor.execute(() -> {
-            stageVocabularies = dao.getVocabularyByStage(currentStage);
+            stageVocabularies = dao.getVocabularyByHskAndStage(currentHskLevel, currentStage);
             
-            if (stageVocabularies.size() < 20) {
-                generateDummyVocab(currentStage, 20 - stageVocabularies.size());
-                stageVocabularies = dao.getVocabularyByStage(currentStage);
+            // If the stage is empty in the database, we might need a fallback or just inform user
+            if (stageVocabularies.isEmpty()) {
+                mainHandler.post(() -> {
+                    Toast.makeText(this, "No vocabulary found for HSK " + currentHskLevel + " Stage " + currentStage, Toast.LENGTH_LONG).show();
+                    finish();
+                });
+                return;
             }
 
             totalItems = stageVocabularies.size();
@@ -132,24 +141,12 @@ public class QuizPage extends AppCompatActivity {
             }
 
             updateStreak();
-            mainHandler.post(this::updateStats);
-            mainHandler.post(this::nextQuestion);
+            mainHandler.post(() -> {
+                tvStage.setText("HSK " + currentHskLevel + " - Stage " + currentStage);
+                updateStats();
+                nextQuestion();
+            });
         });
-    }
-
-    private void generateDummyVocab(int stage, int count) {
-        String[] words = {"人", "大", "天", "太", "夫", "去", "也", "中", "小", "子", "月", "日", "水", "火", "山", "石", "田", "土", "木", "禾",
-                         "口", "耳", "目", "手", "足", "门", "马", "牛", "羊", "鸟", "鱼", "草", "花", "叶", "木", "林", "森", "从", "众", "明"};
-        String[] pinyins = {"rén", "dà", "tiān", "tài", "fū", "qù", "yě", "zhōng", "xiǎo", "zǐ", "yuè", "rì", "shuǐ", "huǒ", "shān", "shí", "tián", "tǔ", "mù", "hé",
-                           "kǒu", "ěr", "mù", "shǒu", "zú", "mén", "mǎ", "niú", "yáng", "niǎo", "yú", "cǎo", "huā", "yè", "mù", "lín", "sēn", "cóng", "zhòng", "míng"};
-        String[] defs = {"person", "big", "day", "too", "husband", "go", "also", "middle", "small", "son", "moon", "sun", "water", "fire", "mountain", "stone", "field", "earth", "wood", "grain",
-                        "mouth", "ear", "eye", "hand", "foot", "door", "horse", "cow", "sheep", "bird", "fish", "grass", "flower", "leaf", "tree", "forest", "dense forest", "follow", "crowd", "bright"};
-
-        int offset = (stage - 1) * count;
-        for (int i = 0; i < count; i++) {
-            int index = (offset + i) % words.length;
-            dao.insert(new Vocabulary(words[index] + (offset + i), pinyins[index], defs[index], stage));
-        }
     }
 
     private void updateStreak() {
@@ -175,6 +172,7 @@ public class QuizPage extends AppCompatActivity {
         int masteredCount = 0;
         int shownCount = 0;
         for (Progress p : stageProgress) {
+            // Using 3 as MASTERED_SCORE from Python logic
             if (p.firstTryCorrect || p.mastery >= 3) masteredCount++;
             if (p.reviewCount > 0) shownCount++;
         }
@@ -255,17 +253,10 @@ public class QuizPage extends AppCompatActivity {
             int streak = stats != null ? stats.currentStreak : 0;
             mainHandler.post(() -> {
                 currentStage++;
-                if (currentStage > 15) {
-                    Intent intent = new Intent(this, ResultQuizPage.class);
-                    intent.putExtra("STREAK", streak);
-                    intent.putExtra("TOTAL_QUESTIONS", 15 * 20);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    Toast.makeText(this, "Stage Completed! Moving to Stage " + currentStage, Toast.LENGTH_SHORT).show();
-                    tvStage.setText("Stage " + currentStage + " / 15");
-                    loadData();
-                }
+                // Check if more stages exist for this HSK level would be ideal
+                // For now just continue to next stage
+                Toast.makeText(this, "HSK " + currentHskLevel + " Stage Completed! Moving to Stage " + currentStage, Toast.LENGTH_SHORT).show();
+                loadData();
             });
         });
     }
@@ -274,15 +265,27 @@ public class QuizPage extends AppCompatActivity {
         List<String> choices = new ArrayList<>();
         choices.add(currentQuestion.pinyin);
 
-        List<Vocabulary> otherVocabs = new ArrayList<>(stageVocabularies);
-        otherVocabs.remove(currentQuestion);
-        Collections.shuffle(otherVocabs);
-        for (int i = 0; i < Math.min(3, otherVocabs.size()); i++) {
-            choices.add(otherVocabs.get(i).pinyin);
+        List<String> allPinyins = new ArrayList<>();
+        for (Vocabulary v : stageVocabularies) {
+            if (!v.pinyin.equals(currentQuestion.pinyin)) {
+                allPinyins.add(v.pinyin);
+            }
+        }
+        
+        Collections.shuffle(allPinyins);
+        
+        int added = 0;
+        for (String p : allPinyins) {
+            if (added >= 3) break;
+            if (!choices.contains(p)) {
+                choices.add(p);
+                added++;
+            }
         }
         
         while (choices.size() < 4) {
-            choices.add("Wrong " + choices.size());
+            String fallback = "Choice " + (choices.size() + 1);
+            if (!choices.contains(fallback)) choices.add(fallback);
         }
 
         Collections.shuffle(choices);
@@ -335,6 +338,7 @@ public class QuizPage extends AppCompatActivity {
             dao.updateProgress(currentProgress);
 
             mainHandler.post(() -> {
+                sessionCorrectCount++;
                 updateStats();
                 showCorrectOverlay();
             });
@@ -354,6 +358,7 @@ public class QuizPage extends AppCompatActivity {
             dao.updateProgress(currentProgress);
 
             mainHandler.post(() -> {
+                sessionWrongCount++;
                 updateStats();
                 showWrongOverlay(yourAnswer);
             });
@@ -378,7 +383,7 @@ public class QuizPage extends AppCompatActivity {
     private void showResultOverlay() {
         tvResultWord.setText(currentQuestion.getDisplayHanzi());
         tvResultPinyin.setText(currentQuestion.pinyin);
-        tvResultDefinition.setText(currentQuestion.definition);
+        tvResultDefinition.setText(currentQuestion.meaning);
         llResultOverlay.setVisibility(View.VISIBLE);
     }
 

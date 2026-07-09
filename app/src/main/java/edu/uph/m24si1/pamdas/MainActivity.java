@@ -30,11 +30,14 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btnHsk2).setOnClickListener(v -> startQuiz(2));
         findViewById(R.id.btnHsk3).setOnClickListener(v -> startQuiz(3));
         findViewById(R.id.btnHsk4).setOnClickListener(v -> startQuiz(4));
+        findViewById(R.id.btnHsk5).setOnClickListener(v -> startQuiz(5));
+        findViewById(R.id.btnHsk6).setOnClickListener(v -> startQuiz(6));
+        findViewById(R.id.btnHsk7).setOnClickListener(v -> startQuiz(7));
     }
 
     private void startQuiz(int level) {
         Intent intent = new Intent(this, QuizPage.class);
-        intent.putExtra("hsk_level", level);
+        intent.putExtra("STAGE", level);
         startActivity(intent);
     }
 }

@@ -238,7 +238,7 @@
                     android:textColor="#3b82f6" />
             </LinearLayout>
 
-<!--            HSK 5-->
+            <!-- HSK 5 -->
             <LinearLayout
                 android:id="@+id/btnHsk5"
                 android:layout_width="match_parent"
@@ -269,7 +269,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="2500 kosakata menengah atas"
+                        android:text="2500 kosakata tingkat lanjut"
                         android:textSize="12sp"
                         android:textColor="#828282"
                         android:layout_marginTop="2dp" />
@@ -283,7 +283,7 @@
                     android:textColor="#3b82f6" />
             </LinearLayout>
 
-<!--            HSK 6-->
+            <!-- HSK 6 -->
             <LinearLayout
                 android:id="@+id/btnHsk6"
                 android:layout_width="match_parent"
@@ -314,7 +314,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="5000 kosakata menengah atas"
+                        android:text="5000 kosakata mahir"
                         android:textSize="12sp"
                         android:textColor="#828282"
                         android:layout_marginTop="2dp" />
@@ -328,7 +328,7 @@
                     android:textColor="#3b82f6" />
             </LinearLayout>
 
-<!--            HSK 7-->
+            <!-- HSK 7 -->
             <LinearLayout
                 android:id="@+id/btnHsk7"
                 android:layout_width="match_parent"
@@ -351,7 +351,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="HSK 7"
+                        android:text="HSK 7-9"
                         android:textSize="17sp"
                         android:textColor="#e6edf3"
                         android:textStyle="bold" />
@@ -359,7 +359,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Lebih dari 5000 kosakata menengah atas"
+                        android:text="Tingkat Lanjut (Mahir Tinggi)"
                         android:textSize="12sp"
                         android:textColor="#828282"
                         android:layout_marginTop="2dp" />
@@ -372,6 +372,7 @@
                     android:textSize="24sp"
                     android:textColor="#3b82f6" />
             </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 

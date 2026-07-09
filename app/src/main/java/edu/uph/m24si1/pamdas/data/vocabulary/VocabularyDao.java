@@ -10,11 +10,14 @@ import java.util.List;
 
 @Dao
 public interface VocabularyDao {
-    @Query("SELECT * FROM vocabulary_table")
+    @Query("SELECT * FROM vocabulary")
     LiveData<List<Vocabulary>> getAllVocabulary();
 
-    @Query("SELECT * FROM vocabulary_table WHERE stage = :stage")
-    List<Vocabulary> getVocabularyByStage(int stage);
+    @Query("SELECT * FROM vocabulary WHERE hskLevel = :hsk AND stage = :stage")
+    List<Vocabulary> getVocabularyByHskAndStage(int hsk, int stage);
+
+    @Query("SELECT COUNT(*) FROM vocabulary WHERE hskLevel = :hsk")
+    int getVocabularyCountForHsk(int hsk);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Vocabulary vocabulary);
@@ -28,10 +31,10 @@ public interface VocabularyDao {
     @Update
     void updateProgress(Progress progress);
 
-    @Query("SELECT AVG(mastery) FROM progress_table p JOIN vocabulary_table v ON p.vocabularyId = v.id WHERE v.stage = :stage")
+    @Query("SELECT AVG(mastery) FROM progress_table p JOIN vocabulary v ON p.vocabularyId = v.id WHERE v.stage = :stage")
     int getAverageMasteryForStage(int stage);
 
-    @Query("SELECT COUNT(*) FROM progress_table p JOIN vocabulary_table v ON p.vocabularyId = v.id WHERE v.stage = :stage AND p.mastery >= 100")
+    @Query("SELECT COUNT(*) FROM progress_table p JOIN vocabulary v ON p.vocabularyId = v.id WHERE v.stage = :stage AND p.mastery >= 100")
     int getCompletedCountForStage(int stage);
 
     @Query("SELECT * FROM user_stats WHERE id = 1")

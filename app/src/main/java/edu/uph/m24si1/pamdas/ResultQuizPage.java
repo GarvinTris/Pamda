@@ -38,12 +38,13 @@ public class ResultQuizPage extends AppCompatActivity {
 
     private void displayResults() {
         int streak = getIntent().getIntExtra("STREAK", 0);
-        int totalQuestions = getIntent().getIntExtra("TOTAL_QUESTIONS", 300);
+        int totalQuestions = getIntent().getIntExtra("TOTAL_QUESTIONS", 0);
+        int totalCorrect = getIntent().getIntExtra("TOTAL_CORRECT", 0);
+        int totalWrong = getIntent().getIntExtra("TOTAL_WRONG", 0);
         
         tvStreak.setText(String.valueOf(streak));
         tvTotalQuestion.setText(String.valueOf(totalQuestions));
-        // These are placeholders, real data should ideally come from DB or calculated during session
-        tvTotalCorrect.setText(String.valueOf(totalQuestions)); 
-        tvTotalWrong.setText("0");
+        tvTotalCorrect.setText(String.valueOf(totalCorrect)); 
+        tvTotalWrong.setText(String.valueOf(totalWrong));
     }
 }
