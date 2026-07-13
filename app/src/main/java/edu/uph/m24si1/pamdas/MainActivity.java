@@ -22,10 +22,6 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // For now, let's just use MainActivity as the starting point.
-        // If MainPage was intended to be the main screen, we can redirect or set it in Manifest.
-        // Based on activity_main.xml content, it looks like a level selection screen.
-        
         findViewById(R.id.btnHsk1).setOnClickListener(v -> startQuiz(1));
         findViewById(R.id.btnHsk2).setOnClickListener(v -> startQuiz(2));
         findViewById(R.id.btnHsk3).setOnClickListener(v -> startQuiz(3));
@@ -37,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void startQuiz(int level) {
         Intent intent = new Intent(this, QuizPage.class);
-        intent.putExtra("STAGE", level);
+        intent.putExtra("STAGE", level); // STAGE extra is used for HSK level in QuizPage
         startActivity(intent);
     }
 }

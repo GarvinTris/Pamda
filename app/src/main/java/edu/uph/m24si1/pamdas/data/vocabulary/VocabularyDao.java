@@ -10,20 +10,17 @@ import java.util.List;
 
 @Dao
 public interface VocabularyDao {
-    @Query("SELECT * FROM vocabulary")
+    @Query("SELECT * FROM database_vocabulary")
     LiveData<List<Vocabulary>> getAllVocabulary();
 
-    @Query("SELECT * FROM vocabulary WHERE hskLevel = :hsk AND stage = :stage")
-    List<Vocabulary> getVocabularyByHskAndStage(int hsk, int stage);
-
-    @Query("SELECT COUNT(*) FROM vocabulary WHERE hskLevel = :hsk")
-    int getVocabularyCountForHsk(int hsk);
+    @Query("SELECT * FROM database_vocabulary WHERE deck_id = :deckId")
+    List<Vocabulary> getVocabularyByDeck(long deckId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Vocabulary vocabulary);
 
-    @Query("SELECT * FROM progress_table WHERE vocabularyId = :vocabId")
-    Progress getProgressForVocabulary(int vocabId);
+    @Query("SELECT * FROM database_progress WHERE vocabulary_id = :vocabId AND session_id = :sessionId")
+    Progress getProgressForVocabularyAndSession(long vocabId, long sessionId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertProgress(Progress progress);
@@ -31,11 +28,11 @@ public interface VocabularyDao {
     @Update
     void updateProgress(Progress progress);
 
-    @Query("SELECT AVG(mastery) FROM progress_table p JOIN vocabulary v ON p.vocabularyId = v.id WHERE v.stage = :stage")
-    int getAverageMasteryForStage(int stage);
+    @Query("SELECT * FROM database_learningsession WHERE deck_id = :deckId LIMIT 1")
+    LearningSession getSessionForDeck(long deckId);
 
-    @Query("SELECT COUNT(*) FROM progress_table p JOIN vocabulary v ON p.vocabularyId = v.id WHERE v.stage = :stage AND p.mastery >= 100")
-    int getCompletedCountForStage(int stage);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    long insertSession(LearningSession session);
 
     @Query("SELECT * FROM user_stats WHERE id = 1")
     UserStats getUserStats();

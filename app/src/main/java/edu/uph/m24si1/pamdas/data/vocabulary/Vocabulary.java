@@ -1,28 +1,51 @@
 package edu.uph.m24si1.pamdas.data.vocabulary;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "vocabulary") // Matching user snippet
+@Entity(
+    tableName = "database_vocabulary",
+    foreignKeys = @ForeignKey(
+        entity = Deck.class,
+        parentColumns = "id",
+        childColumns = "deck_id",
+        onDelete = ForeignKey.NO_ACTION
+    ),
+    indices = {@Index(value = {"deck_id"}, name = "database_vocabulary_deck_id_d5d313a8")}
+)
 public class Vocabulary {
     @PrimaryKey(autoGenerate = true)
-    public int id;
+    public long id;
+    
+    @NonNull
     public String hanzi;
+    
+    @NonNull
     public String pinyin;
+    
+    @NonNull
     public String meaning;
-    public int hskLevel;
-    public int stage;
+    
+    @NonNull
+    public String source;
+    
+    @ColumnInfo(name = "deck_id")
+    public long deckId;
 
-    public Vocabulary(String hanzi, String pinyin, String meaning, int hskLevel, int stage) {
+    public Vocabulary(long id, @NonNull String hanzi, @NonNull String pinyin, @NonNull String meaning, @NonNull String source, long deckId) {
+        this.id = id;
         this.hanzi = hanzi;
         this.pinyin = pinyin;
         this.meaning = meaning;
-        this.hskLevel = hskLevel;
-        this.stage = stage;
+        this.source = source;
+        this.deckId = deckId;
     }
 
     public String getDisplayHanzi() {
-        if (hanzi == null) return "";
         return hanzi.replaceAll("[0-9]", "");
     }
 }

@@ -18,13 +18,17 @@ import androidx.room.Room;
 
 import com.google.android.material.card.MaterialCardView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import edu.uph.m24si1.pamdas.data.vocabulary.LearningSession;
 import edu.uph.m24si1.pamdas.data.vocabulary.Progress;
 import edu.uph.m24si1.pamdas.data.vocabulary.UserStats;
 import edu.uph.m24si1.pamdas.data.vocabulary.Vocabulary;
@@ -45,14 +49,15 @@ public class QuizPage extends AppCompatActivity {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    private List<Vocabulary> stageVocabularies = new ArrayList<>();
+    private List<Vocabulary> deckVocabularies = new ArrayList<>();
+    private final List<Vocabulary> stageVocabularies = new ArrayList<>();
     private final List<Progress> stageProgress = new ArrayList<>();
     private int currentHskLevel = 1;
     private int currentStage = 1;
     private Vocabulary currentQuestion;
     private Progress currentProgress;
+    private long currentSessionId = -1;
 
-    private int totalItems = 0;
     private int sessionCorrectCount = 0;
     private int sessionWrongCount = 0;
 
@@ -67,9 +72,8 @@ public class QuizPage extends AppCompatActivity {
         
         currentHskLevel = getIntent().getIntExtra("STAGE", 1);
         currentStage = 1;
-        tvStage.setText("HSK " + currentHskLevel + " - Stage " + currentStage);
 
-        loadData();
+        loadDeckAndSession();
 
         btnExitSave.setOnClickListener(v -> finish());
         btnContinue.setOnClickListener(v -> {
@@ -109,44 +113,78 @@ public class QuizPage extends AppCompatActivity {
     private void initDatabase() {
         db = Room.databaseBuilder(getApplicationContext(),
                 VocabularyDatabase.class, "pamda_db")
-                .createFromAsset("Pamda_db.sqlite3") // Use the external database file
+                .createFromAsset("databases/pamda_db.sqlite3")
                 .fallbackToDestructiveMigration()
                 .build();
         dao = db.vocabularyDao();
     }
 
-    private void loadData() {
+    private void loadDeckAndSession() {
         executor.execute(() -> {
-            stageVocabularies = dao.getVocabularyByHskAndStage(currentHskLevel, currentStage);
-            
-            // If the stage is empty in the database, we might need a fallback or just inform user
-            if (stageVocabularies.isEmpty()) {
+            LearningSession session = dao.getSessionForDeck(currentHskLevel);
+            if (session == null) {
+                session = new LearningSession(0, 1, getCurrentTimestamp(), getCurrentTimestamp(), currentHskLevel, 10, null);
+                currentSessionId = dao.insertSession(session);
+            } else {
+                currentSessionId = session.id;
+                currentStage = session.currentStage;
+            }
+            loadDeckData();
+        });
+    }
+
+    private void loadDeckData() {
+        executor.execute(() -> {
+            deckVocabularies = dao.getVocabularyByDeck(currentHskLevel);
+            if (deckVocabularies.isEmpty()) {
                 mainHandler.post(() -> {
-                    Toast.makeText(this, "No vocabulary found for HSK " + currentHskLevel + " Stage " + currentStage, Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "No vocabulary found for HSK " + currentHskLevel, Toast.LENGTH_LONG).show();
                     finish();
                 });
                 return;
             }
-
-            totalItems = stageVocabularies.size();
-            stageProgress.clear();
+            Collections.shuffle(deckVocabularies);
             
-            for (Vocabulary v : stageVocabularies) {
-                Progress p = dao.getProgressForVocabulary(v.id);
+            updateStreak();
+            mainHandler.post(this::startStage);
+        });
+    }
+
+    private void startStage() {
+        executor.execute(() -> {
+            stageVocabularies.clear();
+            stageProgress.clear();
+
+            int startIdx = (currentStage - 1) * 20;
+            if (startIdx >= deckVocabularies.size()) {
+                mainHandler.post(this::finishQuiz);
+                return;
+            }
+
+            int endIdx = Math.min(startIdx + 20, deckVocabularies.size());
+            for (int i = startIdx; i < endIdx; i++) {
+                Vocabulary v = deckVocabularies.get(i);
+                stageVocabularies.add(v);
+                
+                Progress p = dao.getProgressForVocabularyAndSession(v.id, currentSessionId);
                 if (p == null) {
-                    p = new Progress(v.id, 0, false, 0, System.currentTimeMillis());
+                    p = new Progress(0, 0, false, 0, getCurrentTimestamp(), currentSessionId, v.id);
                     dao.insertProgress(p);
+                    p = dao.getProgressForVocabularyAndSession(v.id, currentSessionId);
                 }
                 stageProgress.add(p);
             }
 
-            updateStreak();
             mainHandler.post(() -> {
                 tvStage.setText("HSK " + currentHskLevel + " - Stage " + currentStage);
                 updateStats();
                 nextQuestion();
             });
         });
+    }
+
+    private String getCurrentTimestamp() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
     }
 
     private void updateStreak() {
@@ -159,7 +197,7 @@ public class QuizPage extends AppCompatActivity {
             long diff = now - stats.lastActiveDate;
             long dayInMillis = 24 * 60 * 60 * 1000;
             if (diff > dayInMillis && diff < 2 * dayInMillis) {
-                stats.currentStreak++;
+                stats.currentStreak = stats.currentStreak + 1;
             } else if (diff >= 2 * dayInMillis) {
                 stats.currentStreak = 1;
             }
@@ -172,17 +210,17 @@ public class QuizPage extends AppCompatActivity {
         int masteredCount = 0;
         int shownCount = 0;
         for (Progress p : stageProgress) {
-            // Using 3 as MASTERED_SCORE from Python logic
             if (p.firstTryCorrect || p.mastery >= 3) masteredCount++;
             if (p.reviewCount > 0) shownCount++;
         }
 
-        double rate = totalItems > 0 ? (double) masteredCount / totalItems * 100 : 0;
+        int totalInStage = stageVocabularies.size();
+        double rate = totalInStage > 0 ? (double) masteredCount / totalInStage * 100 : 0;
         
         tvMasteryPercent.setText((int)rate + "%");
-        tvMasteryDesc.setText((totalItems - masteredCount) + " soal belum selesai");
+        tvMasteryDesc.setText((totalInStage - masteredCount) + " soal belum selesai");
         
-        tvSoalCount.setText(shownCount + "/" + totalItems);
+        tvSoalCount.setText(shownCount + "/" + totalInStage);
         tvSoalDesc.setText(shownCount + " soal sudah keluar");
     }
 
@@ -229,7 +267,8 @@ public class QuizPage extends AppCompatActivity {
         for (Progress p : stageProgress) {
             if (p.firstTryCorrect || p.mastery >= 3) masteredCount++;
         }
-        double rate = (double) masteredCount / totalItems * 100;
+        int totalInStage = stageVocabularies.size();
+        double rate = totalInStage > 0 ? (double) masteredCount / totalInStage * 100 : 0;
         
         boolean allShown = true;
         for (Progress p : stageProgress) { if (p.reviewCount == 0) { allShown = false; break; } }
@@ -248,15 +287,23 @@ public class QuizPage extends AppCompatActivity {
     }
 
     private void handleStageUp() {
+        currentStage++;
+        Toast.makeText(this, "Stage " + (currentStage - 1) + " Completed!", Toast.LENGTH_SHORT).show();
+        startStage();
+    }
+
+    private void finishQuiz() {
         executor.execute(() -> {
             UserStats stats = dao.getUserStats();
-            int streak = stats != null ? stats.currentStreak : 0;
+            int streak = (stats != null) ? stats.currentStreak : 0;
             mainHandler.post(() -> {
-                currentStage++;
-                // Check if more stages exist for this HSK level would be ideal
-                // For now just continue to next stage
-                Toast.makeText(this, "HSK " + currentHskLevel + " Stage Completed! Moving to Stage " + currentStage, Toast.LENGTH_SHORT).show();
-                loadData();
+                Intent intent = new Intent(this, ResultQuizPage.class);
+                intent.putExtra("STREAK", streak);
+                intent.putExtra("TOTAL_CORRECT", sessionCorrectCount);
+                intent.putExtra("TOTAL_WRONG", sessionWrongCount);
+                intent.putExtra("TOTAL_QUESTIONS", sessionCorrectCount + sessionWrongCount);
+                startActivity(intent);
+                finish();
             });
         });
     }
@@ -265,17 +312,16 @@ public class QuizPage extends AppCompatActivity {
         List<String> choices = new ArrayList<>();
         choices.add(currentQuestion.pinyin);
 
-        List<String> allPinyins = new ArrayList<>();
-        for (Vocabulary v : stageVocabularies) {
+        List<String> distractors = new ArrayList<>();
+        for (Vocabulary v : deckVocabularies) {
             if (!v.pinyin.equals(currentQuestion.pinyin)) {
-                allPinyins.add(v.pinyin);
+                distractors.add(v.pinyin);
             }
         }
-        
-        Collections.shuffle(allPinyins);
+        Collections.shuffle(distractors);
         
         int added = 0;
-        for (String p : allPinyins) {
+        for (String p : distractors) {
             if (added >= 3) break;
             if (!choices.contains(p)) {
                 choices.add(p);
@@ -284,8 +330,7 @@ public class QuizPage extends AppCompatActivity {
         }
         
         while (choices.size() < 4) {
-            String fallback = "Choice " + (choices.size() + 1);
-            if (!choices.contains(fallback)) choices.add(fallback);
+            choices.add("Choice " + (choices.size() + 1));
         }
 
         Collections.shuffle(choices);
@@ -299,8 +344,8 @@ public class QuizPage extends AppCompatActivity {
     }
 
     private void checkAnswer(String selectedPinyin) {
-        String normalizedSelected = normalizeAnswer(selectedPinyin, "choice");
-        String normalizedCorrect = normalizeAnswer(currentQuestion.pinyin, "choice");
+        String normalizedSelected = normalizeAnswer(selectedPinyin);
+        String normalizedCorrect = normalizeAnswer(currentQuestion.pinyin);
 
         if (normalizedSelected.equals(normalizedCorrect)) {
             handleCorrect();
@@ -309,20 +354,9 @@ public class QuizPage extends AppCompatActivity {
         }
     }
 
-    private String normalizeAnswer(String value, String quizMode) {
+    private String normalizeAnswer(String value) {
         if (value == null) return "";
-        String normalized = value.trim().toLowerCase();
-
-        if (quizMode.equals("keyboard")) {
-            return normalized.replace("ā", "a").replace("á", "a").replace("ǎ", "a").replace("à", "a")
-                    .replace("ē", "e").replace("é", "e").replace("ě", "e").replace("è", "e")
-                    .replace("ī", "i").replace("í", "i").replace("ǐ", "i").replace("ì", "i")
-                    .replace("ō", "o").replace("ó", "o").replace("ǒ", "o").replace("ò", "o")
-                    .replace("ū", "u").replace("ú", "u").replace("ǔ", "u").replace("ù", "u")
-                    .replace("ü", "v").replace("ǖ", "v").replace("ǘ", "v").replace("ǚ", "v").replace("ǜ", "v")
-                    .replace(" ", "").replace("-", "");
-        }
-        return normalized.replace(" ", "");
+        return value.trim().toLowerCase().replace(" ", "");
     }
 
     private void handleCorrect() {
@@ -333,8 +367,8 @@ public class QuizPage extends AppCompatActivity {
             } else {
                 currentProgress.mastery = Math.min(currentProgress.mastery + 2, 5);
             }
-            currentProgress.reviewCount++;
-            currentProgress.lastReviewed = System.currentTimeMillis();
+            currentProgress.reviewCount = currentProgress.reviewCount + 1;
+            currentProgress.lastReview = getCurrentTimestamp();
             dao.updateProgress(currentProgress);
 
             mainHandler.post(() -> {
@@ -352,9 +386,9 @@ public class QuizPage extends AppCompatActivity {
             } else {
                 currentProgress.mastery = Math.max(currentProgress.mastery - 1, 0);
             }
-            currentProgress.reviewCount++;
+            currentProgress.reviewCount = currentProgress.reviewCount + 1;
             currentProgress.firstTryCorrect = false;
-            currentProgress.lastReviewed = System.currentTimeMillis();
+            currentProgress.lastReview = getCurrentTimestamp();
             dao.updateProgress(currentProgress);
 
             mainHandler.post(() -> {
