@@ -26,7 +26,7 @@ Keunggulan memilih Pamda:
 - Dapat melatih ulang secara gratis
 
 Batasan Aplikasi:
-- Aplikasi hanya terbatas pada fitur seperti text to audio, fitur mengulangi perkataan
+- Aplikasi dilengkapi dengan fitur pendukung seperti Text-to-Audio untuk melatih pelafalan dan fitur pengulangan materi untuk memperkuat ingatan
 - Fitur timeout tidak dimasukkan, berfokus pada kebiasaan hanzi
 - Tampilan aplikasi kurang interaktif secara moderen
 - Tidak memiliki sistem login / register
