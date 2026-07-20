@@ -26,11 +26,11 @@ Keunggulan memilih Pamda:
 - Dapat melatih ulang secara gratis
 
 Batasan Aplikasi:
-- Aplikasi dilengkapi dengan fitur pendukung seperti Text-to-Audio untuk melatih pelafalan dan fitur pengulangan materi untuk memperkuat ingatan
+- Aplikasi tidak memiliki fitur pendukung tambahan seperti Text-to-Audio untuk melatih pelafalan dan fitur pengulangan materi untuk memperkuat ingatan
 - Fitur timeout tidak dimasukkan, berfokus pada kebiasaan hanzi
 - Tampilan aplikasi kurang interaktif secara moderen
 - Tidak memiliki sistem login / register
-- Keamanan belum di integrasi
+- Keamanan belum diintegrasi
 
-Target Output
+Target Output:
 Setelah selesai mengerjakan semua stage, user diharapkan memiliki fondasi karakter yang kuat untuk menempuh ujian hsk atau sertifikat hsk resmi serta memahami konteks penggunaan hanzi di dunia kerja. Dan harapan kami adalah bahwa user menggunakan aplikasi tersebut dengan nyaman.
