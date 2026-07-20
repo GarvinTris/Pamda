@@ -31,8 +31,14 @@ public interface VocabularyDao {
     @Query("SELECT * FROM database_learningsession WHERE deck_id = :deckId LIMIT 1")
     LearningSession getSessionForDeck(long deckId);
 
+    @Query("SELECT * FROM database_learningsession WHERE id = :id LIMIT 1")
+    LearningSession getSessionById(long id);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insertSession(LearningSession session);
+
+    @Query("DELETE FROM database_progress WHERE session_id = :sessionId")
+    void deleteProgressForSession(long sessionId);
 
     @Query("SELECT * FROM user_stats WHERE id = 1")
     UserStats getUserStats();

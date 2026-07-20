@@ -2,33 +2,36 @@ package edu.uph.m24si1.pamdas;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.activity.EdgeToEdge;
+import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.mainpage);
         
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        View btn1 = findViewById(R.id.btnHsk1);
+        if (btn1 != null) btn1.setOnClickListener(v -> startQuiz(1));
 
-        findViewById(R.id.btnHsk1).setOnClickListener(v -> startQuiz(1));
-        findViewById(R.id.btnHsk2).setOnClickListener(v -> startQuiz(2));
-        findViewById(R.id.btnHsk3).setOnClickListener(v -> startQuiz(3));
-        findViewById(R.id.btnHsk4).setOnClickListener(v -> startQuiz(4));
-        findViewById(R.id.btnHsk5).setOnClickListener(v -> startQuiz(5));
-        findViewById(R.id.btnHsk6).setOnClickListener(v -> startQuiz(6));
-        findViewById(R.id.btnHsk7).setOnClickListener(v -> startQuiz(7));
+        View btn2 = findViewById(R.id.btnHsk2);
+        if (btn2 != null) btn2.setOnClickListener(v -> startQuiz(2));
+
+        View btn3 = findViewById(R.id.btnHsk3);
+        if (btn3 != null) btn3.setOnClickListener(v -> startQuiz(3));
+
+        View btn4 = findViewById(R.id.btnHsk4);
+        if (btn4 != null) btn4.setOnClickListener(v -> startQuiz(4));
+
+        View btn5 = findViewById(R.id.btnHsk5);
+        if (btn5 != null) btn5.setOnClickListener(v -> startQuiz(5));
+
+        View btn6 = findViewById(R.id.btnHsk6);
+        if (btn6 != null) btn6.setOnClickListener(v -> startQuiz(6));
+
+        View btn7 = findViewById(R.id.btnHsk7);
+        if (btn7 != null) btn7.setOnClickListener(v -> startQuiz(7));
     }
 
     private void startQuiz(int level) {

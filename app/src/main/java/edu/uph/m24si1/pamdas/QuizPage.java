@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
 
 import com.google.android.material.card.MaterialCardView;
 
@@ -75,7 +74,16 @@ public class QuizPage extends AppCompatActivity {
 
         loadDeckAndSession();
 
-        btnExitSave.setOnClickListener(v -> finish());
+        btnExitSave.setOnClickListener(v -> {
+            executor.execute(() -> {
+                LearningSession session = dao.getSessionById(currentSessionId);
+                if (session != null) {
+                    session.lastPlayed = getCurrentTimestamp();
+                    dao.insertSession(session);
+                }
+                mainHandler.post(this::finish);
+            });
+        });
         btnContinue.setOnClickListener(v -> {
             llResultOverlay.setVisibility(View.GONE);
             nextQuestion();
@@ -111,29 +119,11 @@ public class QuizPage extends AppCompatActivity {
     }
 
     private void initDatabase() {
-        db = Room.databaseBuilder(getApplicationContext(),
-                VocabularyDatabase.class, "pamda_db")
-                .createFromAsset("databases/pamda_db.sqlite3")
-                .fallbackToDestructiveMigration()
-                .build();
+        db = VocabularyDatabase.getDatabase(getApplicationContext());
         dao = db.vocabularyDao();
     }
 
     private void loadDeckAndSession() {
-        executor.execute(() -> {
-            LearningSession session = dao.getSessionForDeck(currentHskLevel);
-            if (session == null) {
-                session = new LearningSession(0, 1, getCurrentTimestamp(), getCurrentTimestamp(), currentHskLevel, 10, null);
-                currentSessionId = dao.insertSession(session);
-            } else {
-                currentSessionId = session.id;
-                currentStage = session.currentStage;
-            }
-            loadDeckData();
-        });
-    }
-
-    private void loadDeckData() {
         executor.execute(() -> {
             deckVocabularies = dao.getVocabularyByDeck(currentHskLevel);
             if (deckVocabularies.isEmpty()) {
@@ -144,7 +134,29 @@ public class QuizPage extends AppCompatActivity {
                 return;
             }
             Collections.shuffle(deckVocabularies);
-            
+
+            LearningSession session = dao.getSessionForDeck(currentHskLevel);
+            if (session == null) {
+                session = new LearningSession(0, 1, getCurrentTimestamp(), getCurrentTimestamp(), currentHskLevel, 10, null);
+                currentSessionId = dao.insertSession(session);
+                currentStage = 1;
+            } else {
+                currentSessionId = session.id;
+                currentStage = session.currentStage;
+
+                // Check if the session was already completed
+                int totalVocab = deckVocabularies.size();
+                int maxStage = (int) Math.ceil((double) totalVocab / 20);
+                if (currentStage > maxStage) {
+                    currentStage = 1;
+                    session.currentStage = 1;
+                    session.lastPlayed = getCurrentTimestamp();
+                    dao.insertSession(session);
+                    // Reset progress for this session so the user can play again
+                    dao.deleteProgressForSession(currentSessionId);
+                }
+            }
+
             updateStreak();
             mainHandler.post(this::startStage);
         });
@@ -288,6 +300,14 @@ public class QuizPage extends AppCompatActivity {
 
     private void handleStageUp() {
         currentStage++;
+        executor.execute(() -> {
+            LearningSession session = dao.getSessionById(currentSessionId);
+            if (session != null) {
+                session.currentStage = currentStage;
+                session.lastPlayed = getCurrentTimestamp();
+                dao.insertSession(session);
+            }
+        });
         Toast.makeText(this, "Stage " + (currentStage - 1) + " Completed!", Toast.LENGTH_SHORT).show();
         startStage();
     }

@@ -29,6 +29,10 @@
         <activity
             android:name=".ResultPage"
             android:exported="false" />
+
+        <activity
+            android:name=".MainPage"
+            android:exported="false" />
     </application>
 
 </manifest>

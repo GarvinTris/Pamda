@@ -24,7 +24,7 @@ public class ResultPage extends AppCompatActivity {
         ((TextView) findViewById(R.id.tvTotalQuestion)).setText(String.valueOf(totalQuestion));
 
         findViewById(R.id.btnFinish).setOnClickListener(v -> {
-            Intent intent = new Intent(ResultPage.this, MainPage.class);
+            Intent intent = new Intent(ResultPage.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
             finish();

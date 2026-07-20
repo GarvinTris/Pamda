@@ -22,7 +22,7 @@ public class ResultQuizPage extends AppCompatActivity {
         displayResults();
 
         btnFinish.setOnClickListener(v -> {
-            Intent intent = new Intent(ResultQuizPage.this, MainPage.class);
+            Intent intent = new Intent(ResultQuizPage.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         });
