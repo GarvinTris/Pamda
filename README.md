@@ -33,4 +33,4 @@ Batasan Aplikasi:
 - Keamanan belum diintegrasi
 
 Target Output:
-Setelah selesai mengerjakan semua stage, user diharapkan memiliki fondasi karakter yang kuat untuk menempuh ujian hsk atau sertifikat hsk resmi serta memahami konteks penggunaan hanzi di dunia kerja. Dan harapan kami adalah bahwa user menggunakan aplikasi tersebut dengan nyaman.
+- Setelah selesai mengerjakan semua stage, user diharapkan memiliki fondasi karakter yang kuat untuk menempuh ujian hsk atau sertifikat hsk resmi serta memahami konteks penggunaan hanzi di dunia kerja. Dan harapan kami adalah bahwa user menggunakan aplikasi tersebut dengan nyaman.
